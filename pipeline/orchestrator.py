@@ -76,9 +76,19 @@ class Pipeline:
                 agent.validate_input(input_data)
                 output = agent.execute(input_data)
                 
-                # Pass findings to next agent as context
-                context[agent.name] = output.findings
-                current_query = output.findings.get("summary", str(output.findings))
+                # Extract events from findings and pass to next agent
+                findings = output.findings
+                events = findings.get("events", [])
+                
+                # Pass entire findings to context for next agent
+                context["events"] = events
+                context[agent.name] = findings
+                
+                # Also update summary for next agent
+                if events:
+                    current_query = f"Found {len(events)} events to process"
+                else:
+                    current_query = str(findings)
                 
                 self.execution_history.append(output)
                 logger.info(f"Agent {agent.name} completed successfully")

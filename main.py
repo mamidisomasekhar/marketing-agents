@@ -25,7 +25,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def create_pipeline() -> Pipeline:
+def create_pipeline(provider: str = "tavily") -> Pipeline:
     """Create and configure the event research pipeline.
     
     Pipeline flow:
@@ -43,7 +43,7 @@ def create_pipeline() -> Pipeline:
     pipeline = Pipeline()
     
     # Add all event research agents in sequence
-    pipeline.add_agent(EventDiscoveryAgent(max_events=50))
+    pipeline.add_agent(EventDiscoveryAgent(max_events=50, provider=provider))
     pipeline.add_agent(EventQualificationAgent())
     pipeline.add_agent(EventWebsiteScraperAgent())
     pipeline.add_agent(EventIntelligenceAgent())
@@ -56,11 +56,14 @@ def create_pipeline() -> Pipeline:
 
 def run_command(args):
     """Run the pipeline with input parameters."""
-    pipeline = create_pipeline()
+    provider = getattr(args, 'provider', 'tavily')
+    pipeline = create_pipeline(provider=provider)
     
     if not pipeline.agents:
         logger.error("No agents configured. Add agents before running.")
         sys.exit(1)
+    
+    logger.info(f"Using search provider: {provider}")
     
     # Build parameters from arguments
     params = {}
@@ -160,17 +163,17 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Find Payments events in Middle East
-  python -m marketing_agents run --industry Payments --region "Middle East"
+  # Find Payments events in Middle East (using Search1API - free)
+  python -m marketing_agents run --industry Payments --region "Middle East" --provider search1api
   
-  # Find AI conferences in APAC
-  python -m marketing_agents run --industry "Artificial Intelligence" --region APAC
+  # Find AI conferences in APAC (using DuckDuckGo - free)
+  python -m marketing_agents run --industry "Artificial Intelligence" --region APAC --provider duckduckgo
   
-  # Find FinTech events globally
+  # Find FinTech events globally (using default Tavily)
   python -m marketing_agents run --industry FinTech --region global
   
-  # With custom theme
-  python -m marketing_agents run --industry Payments --theme "digital payments" --region USA
+  # With custom theme and Serper
+  python -m marketing_agents run --industry Payments --theme "digital payments" --region USA --provider serper
         """
     )
     subparsers = parser.add_subparsers(dest="command", help="Commands")
@@ -198,6 +201,12 @@ Examples:
         "--output", "-o",
         default="event_pipeline_results.json",
         help="Output file name (default: event_pipeline_results.json)"
+    )
+    run_parser.add_argument(
+        "--provider", "-v",
+        default="auto",
+        choices=["auto", "tavily", "serper", "search1api", "duckduckgo"],
+        help="Search provider (auto=tavily→serper→search1api→duckduckgo)"
     )
     run_parser.set_defaults(func=run_command)
     

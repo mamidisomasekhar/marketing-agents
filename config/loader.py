@@ -4,8 +4,11 @@ import os
 import yaml
 from pathlib import Path
 from typing import Any, Optional
+from dotenv import load_dotenv
 
 DEFAULT_CONFIG_DIR = Path(__file__).parent.parent / "config"
+
+load_dotenv()
 
 
 def load_yaml(file_path: Path) -> dict[str, Any]:
@@ -58,6 +61,11 @@ def get_env_var(key: str, default: Optional[str] = None, required: bool = False)
         Environment variable value or default
     """
     value = os.environ.get(key, default)
+    
+    # Treat empty string or placeholder as not set
+    if value in (None, "", "your_openai_api_key_here", "your_tavily_api_key_here", 
+                 "your_serper_api_key_here", "your_search1api_key_here"):
+        value = None
     
     if required and value is None:
         raise ValueError(f"Required environment variable {key} is not set")
