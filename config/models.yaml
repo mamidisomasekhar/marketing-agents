@@ -1,0 +1,346 @@
+llm:
+  agent_models:
+    event_discovery:
+      max_tokens: 3000
+      model: glm-latest
+      provider: grid_ai
+      recommendations:
+        best_for_budget: glm-flash-experimental
+        best_for_quality: gemini-3.1-pro
+        capped:
+          model: gemini-3.1-pro
+          reason: Search grounding + 1M context
+        non_capped:
+          model: glm-latest
+          reason: Balanced cost and quality
+      temperature: 0.3
+    event_intelligence:
+      max_tokens: 4000
+      model: open-large-sa
+      provider: grid_ai
+      recommendations:
+        best_for_budget: open-large-sa
+        best_for_quality: gemini-3.1-pro
+        capped:
+          model: gemini-3.1-pro
+          reason: Search grounding + 1M context
+        non_capped:
+          model: open-large-sa
+          reason: Long context (Kimi) for research
+      temperature: 0.4
+    event_prioritization:
+      max_tokens: 2000
+      model: glm-flash-experimental
+      provider: grid_ai
+      recommendations:
+        best_for_budget: glm-flash-experimental
+        best_for_quality: claude-sonnet-4-5
+        capped:
+          model: claude-haiku-4-5-20251001
+          reason: Reliable ranking logic
+        non_capped:
+          model: glm-flash-experimental
+          reason: Fast, cheap sorting
+      temperature: 0.2
+    event_qualification:
+      max_tokens: 4000
+      model: glm-latest
+      provider: grid_ai
+      recommendations:
+        best_for_budget: glm-latest
+        best_for_quality: claude-opus-4-6
+        capped:
+          model: claude-sonnet-4-6
+          reason: High-quality scoring
+        non_capped:
+          model: glm-latest
+          reason: Best judgment among non-capped
+      temperature: 0.3
+    event_website_scraper:
+      max_tokens: 2000
+      model: glm-flash-experimental
+      provider: grid_ai
+      recommendations:
+        best_for_budget: glm-flash-experimental
+        best_for_quality: claude-haiku-4-5-20251001
+        capped:
+          model: claude-haiku-4-5-20251001
+          reason: Fast and reliable extraction
+        non_capped:
+          model: glm-flash-experimental
+          reason: Ultra-cheap for high volume
+      temperature: 0.1
+    excel_table_generator:
+      max_tokens: 2000
+      model: glm-flash-experimental
+      provider: grid_ai
+      recommendations:
+        best_for_budget: glm-flash-experimental
+        best_for_quality: claude-haiku-4-5-20251001
+        capped:
+          model: claude-haiku-4-5-20251001
+          reason: Reliable table formatting
+        non_capped:
+          model: glm-flash-experimental
+          reason: Cheapest structured output
+      temperature: 0.1
+    intent_understanding:
+      max_tokens: 4000
+      model: glm-latest
+      provider: grid_ai
+      recommendations:
+        best_for_budget: glm-latest
+        best_for_quality: claude-opus-4-6
+        capped:
+          model: claude-opus-4-6
+          reason: Highest reasoning capability
+        non_capped:
+          model: glm-latest
+          reason: Best reasoning among non-capped
+      temperature: 0.3
+    outreach_email:
+      max_tokens: 4000
+      model: open-fast
+      provider: grid_ai
+      recommendations:
+        best_for_budget: open-fast
+        best_for_quality: claude-sonnet-4-6
+        capped:
+          model: claude-sonnet-4-5
+          reason: Best writing quality
+        non_capped:
+          model: open-fast
+          reason: Fast, good writing (Minimax)
+      temperature: 0.7
+    schema_initialization:
+      max_tokens: 2000
+      model: glm-flash-experimental
+      provider: grid_ai
+      recommendations:
+        best_for_budget: glm-flash-experimental
+        best_for_quality: claude-haiku-4-5-20251001
+        capped:
+          model: claude-haiku-4-5-20251001
+          reason: Reliable JSON output
+        non_capped:
+          model: glm-flash-experimental
+          reason: Cheapest, fast JSON generation
+      temperature: 0.1
+    vendor_discovery:
+      max_tokens: 3000
+      model: open-large-sa
+      provider: grid_ai
+      recommendations:
+        best_for_budget: open-large-sa
+        best_for_quality: gemini-3.1-pro
+        capped:
+          model: gemini-3-flash-preview
+          reason: Search + 1M context, cheap
+        non_capped:
+          model: open-large-sa
+          reason: Long context for vendor research
+      temperature: 0.3
+  defaults:
+    max_tokens: 2000
+    model: claude-sonnet-4-5
+    provider: grid_ai
+    retry_attempts: 3
+    temperature: 0.3
+    timeout_seconds: 60
+  providers:
+    grid_ai:
+      api_key_env: GRID_AI_API_KEY
+      base_url: https://grid.ai.juspay.net
+      default_model: claude-sonnet-4-5
+      models:
+      - best_for:
+        - complex_reasoning
+        - deep_analysis
+        - critical_decisions
+        - intent_understanding
+        context_window: 200000
+        cost_per_1k_input: 0.015
+        cost_per_1k_output: 0.075
+        description: Highest reasoning capability, best for complex analysis
+        id: claude-opus-4-6
+        name: Claude Opus 4.6
+        provider: anthropic
+        supports_json: true
+        supports_search: false
+        supports_vision: true
+        tier: ultra
+      - best_for:
+        - general_purpose
+        - event_qualification
+        - outreach_email
+        context_window: 200000
+        cost_per_1k_input: 0.003
+        cost_per_1k_output: 0.015
+        description: Fast, high-quality, balanced performance
+        id: claude-sonnet-4-6
+        name: Claude Sonnet 4.6
+        provider: anthropic
+        supports_json: true
+        supports_search: false
+        supports_vision: true
+        tier: high
+      - best_for:
+        - event_discovery
+        - balanced_tasks
+        context_window: 200000
+        cost_per_1k_input: 0.003
+        cost_per_1k_output: 0.015
+        description: Reliable, fast, cost-effective
+        id: claude-sonnet-4-5
+        name: Claude Sonnet 4.5
+        provider: anthropic
+        supports_json: true
+        supports_search: false
+        supports_vision: true
+        tier: high
+      - best_for:
+        - quick_tasks
+        - high_volume
+        - schema_initialization
+        - event_prioritization
+        context_window: 200000
+        cost_per_1k_input: 0.00025
+        cost_per_1k_output: 0.00125
+        description: Fastest Claude model, good for simple tasks
+        id: claude-haiku-4-5-20251001
+        name: Claude Haiku 3.5
+        provider: anthropic
+        supports_json: true
+        supports_search: false
+        supports_vision: false
+        tier: fast
+      - best_for:
+        - long_context
+        - search_grounding
+        - event_intelligence
+        - vendor_discovery
+        context_window: 1000000
+        cost_per_1k_input: 0.0035
+        cost_per_1k_output: 0.0105
+        description: 1M context, native search grounding, multimodal
+        id: gemini-3.1-pro
+        name: Gemini 3.1 Pro
+        provider: google
+        supports_json: true
+        supports_search: true
+        supports_vision: true
+        tier: high
+      - best_for:
+        - cost_effective
+        - high_volume
+        - vendor_discovery
+        - event_website_scraper
+        context_window: 1000000
+        cost_per_1k_input: 0.00035
+        cost_per_1k_output: 0.00105
+        description: Fastest, cheapest, 1M context, search enabled
+        id: gemini-3-flash-preview
+        name: Gemini 3 Flash
+        provider: google
+        supports_json: true
+        supports_search: true
+        supports_vision: true
+        tier: fast
+      - best_for:
+        - experimental
+        - cutting_edge
+        context_window: 1000000
+        cost_per_1k_input: 0.0035
+        cost_per_1k_output: 0.0105
+        description: Preview version with latest features
+        id: gemini-3-pro-preview
+        name: Gemini 3 Pro Preview
+        provider: google
+        supports_json: true
+        supports_search: true
+        supports_vision: true
+        tier: high
+      - best_for:
+        - long_context
+        - document_analysis
+        - event_intelligence
+        context_window: 200000
+        cost_per_1k_input: 0.002
+        cost_per_1k_output: 0.008
+        description: 200K context, strong reasoning, good for analysis
+        id: kimi-latest
+        name: Kimi K2.5
+        provider: moonshot
+        supports_json: true
+        supports_search: false
+        supports_vision: true
+        tier: high
+      - best_for:
+        - reasoning
+        - chinese_english
+        context_window: 128000
+        cost_per_1k_input: 0.003
+        cost_per_1k_output: 0.009
+        description: Latest GLM, good reasoning capabilities
+        id: glm-latest
+        name: GLM-5 Dev
+        provider: zhipu
+        supports_json: true
+        supports_search: false
+        supports_vision: true
+        tier: high
+      - best_for:
+        - speed
+        - cost_effective
+        - event_website_scraper
+        - excel_table_generator
+        context_window: 128000
+        cost_per_1k_input: 0.0003
+        cost_per_1k_output: 0.0009
+        description: Ultra-fast, cheapest model available
+        id: glm-flash-experimental
+        name: GLM 4.7 Flash
+        provider: zhipu
+        supports_json: true
+        supports_search: false
+        supports_vision: false
+        tier: fast
+      - best_for:
+        - general_purpose
+        context_window: 128000
+        cost_per_1k_input: 0.005
+        cost_per_1k_output: 0.015
+        description: General purpose, OpenAI-compatible
+        id: open-large
+        name: Open Large
+        provider: openai_compatible
+        supports_json: true
+        supports_search: false
+        supports_vision: true
+        tier: high
+      - best_for:
+        - quick_tasks
+        - excel_table_generator
+        context_window: 128000
+        cost_per_1k_input: 0.0005
+        cost_per_1k_output: 0.0015
+        description: Fast, cost-effective
+        id: open-fast
+        name: Open Fast
+        provider: openai_compatible
+        supports_json: true
+        supports_search: false
+        supports_vision: false
+        tier: fast
+      name: Juspay Grid AI
+selection_strategy:
+  cost_thresholds:
+    balanced: 0.005
+    cost_sensitive: 0.001
+    high_value: 0.02
+    ultra_critical: 0.1
+  primary_criteria:
+  - cost_efficiency
+  - reasoning_quality
+  - context_length
+  - search_capability
